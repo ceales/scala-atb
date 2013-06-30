@@ -23,7 +23,6 @@ trait TriBoolRepresentation
       case true => True
       case false => False
     }
-
 }
 
 trait CoreTriBool extends TriBoolRepresentation
@@ -69,13 +68,13 @@ object KleeneTriBool
   case object Unknown extends KleeneTriBool
 }
 
-class KleeneTriBool private() extends CoreTriBool
+sealed abstract class KleeneTriBool extends CoreTriBool
 {
   type Representation = KleeneTriBool
 
-  lazy val True = KleeneTriBool.True
-  lazy val False = KleeneTriBool.False
-  lazy val Unknown = KleeneTriBool.Unknown
+  protected lazy val True = KleeneTriBool.True
+  protected lazy val False = KleeneTriBool.False
+  protected lazy val Unknown = KleeneTriBool.Unknown
 
   def implies(other : Representation) = !this or other
 }
@@ -87,13 +86,13 @@ object LukasiewiczTriBool
   case object Unknown extends LukasiewiczTriBool
 }
 
-class LukasiewiczTriBool private() extends CoreTriBool
+sealed abstract class LukasiewiczTriBool extends CoreTriBool
 {
   type Representation = LukasiewiczTriBool
 
-  lazy val True = LukasiewiczTriBool.True
-  lazy val False = LukasiewiczTriBool.False
-  lazy val Unknown = LukasiewiczTriBool.Unknown
+  protected lazy val True = LukasiewiczTriBool.True
+  protected lazy val False = LukasiewiczTriBool.False
+  protected lazy val Unknown = LukasiewiczTriBool.Unknown
 
   def implies(other : Representation) =
     (this) match
