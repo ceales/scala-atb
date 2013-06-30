@@ -14,15 +14,6 @@ trait TriBoolRepresentation
   protected val True : Representation
   protected val False : Representation
   protected val Unknown : Representation
-
-  import scala.language.implicitConversions
-
-  implicit def convertFromBoolean(x : Boolean) =
-    x match
-    {
-      case true => True
-      case false => False
-    }
 }
 
 trait CoreTriBool extends TriBoolRepresentation
