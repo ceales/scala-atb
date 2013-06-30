@@ -7,92 +7,211 @@
 package atb
 {
 
-trait TriBoolRepresentation
-{
-  type Representation
+  object ConcreteTriBoolean
+  {
+    case object True extends ConcreteTriBoolean
+    case object False extends ConcreteTriBoolean
+    case object Unknown extends ConcreteTriBoolean
+  }
 
-  protected val True : Representation
-  protected val False : Representation
-  protected val Unknown : Representation
-}
+  abstract sealed trait ConcreteTriBoolean
+  {
+  }
 
-trait CoreTriBool extends TriBoolRepresentation
-{
-  def not =
-    this match
+  object TriBoolean
+  {
+
+    abstract trait TriBooleanNegatable[T <: TriBoolean]
+        extends TriBoolean
     {
-      case True => False
-      case False => True
-      case Unknown => Unknown
+      def not: T
+
+      def unary_! = not
     }
 
-  def unary_! = not
-
-  def and(other : Representation) =
-    (this) match
-      {
-        case True => other
-        case False => False
-        case Unknown =>
-          if ( other == False ) False else Unknown
-      }
-
-  def or(other : Representation) =
-    (this) match
-      {
-        case True => True
-        case False => other
-        case Unknown =>
-          if ( other == True ) True else Unknown
-      }
-
-  def |(other : Representation) = this or other
-  def &(other : Representation) = this and other
-
-  def implies(other : Representation) : Representation
-}
-
-object KleeneTriBool
-{
-  case object True extends KleeneTriBool
-  case object False extends KleeneTriBool
-  case object Unknown extends KleeneTriBool
-}
-
-sealed abstract class KleeneTriBool extends CoreTriBool
-{
-  type Representation = KleeneTriBool
-
-  protected lazy val True = KleeneTriBool.True
-  protected lazy val False = KleeneTriBool.False
-  protected lazy val Unknown = KleeneTriBool.Unknown
-
-  def implies(other : Representation) = !this or other
-}
-
-object LukasiewiczTriBool
-{
-  case object True extends LukasiewiczTriBool
-  case object False extends LukasiewiczTriBool
-  case object Unknown extends LukasiewiczTriBool
-}
-
-sealed abstract class LukasiewiczTriBool extends CoreTriBool
-{
-  type Representation = LukasiewiczTriBool
-
-  protected lazy val True = LukasiewiczTriBool.True
-  protected lazy val False = LukasiewiczTriBool.False
-  protected lazy val Unknown = LukasiewiczTriBool.Unknown
-
-  def implies(other : Representation) =
-    (this) match
+    abstract trait TriBooleanConjunctable[T <: TriBoolean]
+        extends TriBoolean
     {
-      case False => True
-      case True => other
-      case Unknown =>
-        if ( other == False ) Unknown else True
+      def and(other: T): T
     }
-}
+
+    abstract trait TriBooleanDisjunctable[T <: TriBoolean]
+        extends TriBoolean
+    {
+      def or(other: T): T
+    }
+
+    abstract trait TriBooleanImplicable[T <: TriBoolean]
+        extends TriBoolean
+    {
+      def implies(other: T): T
+    }
+
+    abstract trait TriBooleanBuilder[T <: TriBoolean]
+    {
+      def makeTriBoolean(x : ConcreteTriBoolean) : T
+    }
+
+  }
+
+  class TriBoolean(val value : ConcreteTriBoolean)
+  {
+    override def equals(other: Any) =
+      other match {
+        case that: TriBoolean => value == that.value
+        case _ => false
+      }
+
+    override def hashCode = value.hashCode
+    override def toString = value.toString
+
+  }
+
+  trait KleeneNegation[T <: TriBoolean]
+      extends TriBoolean.TriBooleanNegatable[T]
+      with TriBoolean.TriBooleanBuilder[T]
+  {
+    def not : T =
+    {
+      import ConcreteTriBoolean._
+      makeTriBoolean (
+        (value) match {
+          case True => False
+          case False => True
+          case Unknown => Unknown
+        }
+      )
+    }
+  }
+
+  trait KleeneConjunction[T <: TriBoolean]
+      extends TriBoolean.TriBooleanConjunctable[T]
+      with TriBoolean.TriBooleanBuilder[T]
+  {
+    def and(other : T) : T =
+    {
+      import ConcreteTriBoolean._
+      makeTriBoolean(
+        (value) match {
+          case True => other.value
+          case False => False
+          case Unknown =>
+            if ( other.value == False ) False else Unknown
+        }
+      )
+    }
+  }
+
+  trait KleeneDisjunction[T <: TriBoolean]
+      extends TriBoolean.TriBooleanDisjunctable[T]
+      with TriBoolean.TriBooleanBuilder[T]
+  {
+    def or(other : T) : T =
+    {
+      import ConcreteTriBoolean._
+      makeTriBoolean(
+        (value) match {
+          case True => True
+          case False => other.value
+          case Unknown =>
+            if ( other.value == True ) True else Unknown
+        }
+      )
+    }
+  }
+
+  trait KleeneImplication[T <: TriBoolean]
+      extends TriBoolean.TriBooleanImplicable[T]
+      with TriBoolean.TriBooleanDisjunctable[T]
+      with TriBoolean.TriBooleanNegatable[T]
+  {
+    def implies(other : T) : T = this or other
+  }
+
+  trait LukasiewiczImplication[T <: TriBoolean]
+      extends TriBoolean.TriBooleanImplicable[T]
+      with TriBoolean.TriBooleanBuilder[T]
+  {
+    def implies(other : T) : T =
+    {
+      import ConcreteTriBoolean._
+      makeTriBoolean(
+        (this.value) match {
+          case False => True
+          case True => other.value
+          case Unknown =>
+            if ( other.value == False ) Unknown else True
+        }
+      )
+    }
+  }
+
+  object KleeneBoolean
+  {
+    case object True extends KleeneBoolean(ConcreteTriBoolean.True)
+    case object False extends KleeneBoolean(ConcreteTriBoolean.False)
+    case object Unknown extends KleeneBoolean(ConcreteTriBoolean.Unknown)
+  }
+
+  sealed abstract class KleeneBoolean(value : ConcreteTriBoolean)
+      extends TriBoolean(value)
+      with KleeneNegation[KleeneBoolean]
+      with KleeneConjunction[KleeneBoolean]
+      with KleeneDisjunction[KleeneBoolean]
+      with KleeneImplication[KleeneBoolean]
+      with TriBoolean.TriBooleanBuilder[KleeneBoolean]
+  {
+
+    override def equals(other: Any) =
+      other match {
+        case that: KleeneBoolean => super.equals(other)
+        case _ => false
+      }
+
+    def makeTriBoolean(x : ConcreteTriBoolean) : KleeneBoolean =
+      (x) match {
+        case ConcreteTriBoolean.True => KleeneBoolean.True
+        case ConcreteTriBoolean.False => KleeneBoolean.False
+        case ConcreteTriBoolean.Unknown => KleeneBoolean.Unknown
+      }
+  }
+
+  object LukasiewiczBoolean
+  {
+    case object True extends LukasiewiczBoolean(ConcreteTriBoolean.True)
+    case object False extends LukasiewiczBoolean(ConcreteTriBoolean.False)
+    case object Unknown extends LukasiewiczBoolean(ConcreteTriBoolean.Unknown)
+  }
+
+  sealed abstract class LukasiewiczBoolean(value : ConcreteTriBoolean)
+      extends TriBoolean(value)
+      with KleeneNegation[LukasiewiczBoolean]
+      with KleeneConjunction[LukasiewiczBoolean]
+      with KleeneDisjunction[LukasiewiczBoolean]
+      with LukasiewiczImplication[LukasiewiczBoolean]
+      with TriBoolean.TriBooleanBuilder[LukasiewiczBoolean]
+  {
+    override def equals(other: Any) =
+      other match {
+        case that: LukasiewiczBoolean => super.equals(other)
+        case _ => false
+      }
+
+    def makeTriBoolean(x : ConcreteTriBoolean) : LukasiewiczBoolean =
+      (x) match {
+        case ConcreteTriBoolean.True => LukasiewiczBoolean.True
+        case ConcreteTriBoolean.False => LukasiewiczBoolean.False
+        case ConcreteTriBoolean.Unknown => LukasiewiczBoolean.Unknown
+      }
+
+    def isNotFalse : LukasiewiczBoolean =
+      !this implies this
+
+    def isTrue : LukasiewiczBoolean =
+      !((!this).isNotFalse)
+
+    def isUnknown : LukasiewiczBoolean =
+      (!isNotFalse) and (!isTrue)
+  }
 
 }
