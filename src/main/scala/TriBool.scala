@@ -25,7 +25,6 @@ package atb
         extends TriBoolean
     {
       def not: T
-
       def unary_! = not
     }
 
@@ -69,8 +68,9 @@ package atb
 
   trait KleeneNegation[T <: TriBoolean]
       extends TriBoolean.Negatable[T]
-      with TriBoolean.Builder[T]
   {
+    this : TriBoolean.Builder[T] =>
+
     def not : T =
     {
       import ConcreteTriBoolean._
@@ -86,8 +86,9 @@ package atb
 
   trait KleeneConjunction[T <: TriBoolean]
       extends TriBoolean.Conjunctable[T]
-      with TriBoolean.Builder[T]
   {
+    this : TriBoolean.Builder[T] =>
+
     def and(other : T) : T =
     {
       import ConcreteTriBoolean._
@@ -104,8 +105,9 @@ package atb
 
   trait KleeneDisjunction[T <: TriBoolean]
       extends TriBoolean.Disjunctable[T]
-      with TriBoolean.Builder[T]
   {
+    this : TriBoolean.Builder[T] =>
+
     def or(other : T) : T =
     {
       import ConcreteTriBoolean._
@@ -122,8 +124,9 @@ package atb
 
   trait KleeneImplication[T <: TriBoolean]
       extends TriBoolean.Implicable[T]
-      with TriBoolean.Builder[T]
   {
+    this : TriBoolean.Builder[T] =>
+
     def implies(other : T) : T =
       {
         import ConcreteTriBoolean._
@@ -140,8 +143,9 @@ package atb
 
   trait LukasiewiczImplication[T <: TriBoolean]
       extends TriBoolean.Implicable[T]
-      with TriBoolean.Builder[T]
   {
+    this : TriBoolean.Builder[T] =>
+
     def implies(other : T) : T =
     {
       import ConcreteTriBoolean._
