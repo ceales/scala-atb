@@ -122,10 +122,20 @@ package atb
 
   trait KleeneImplication[T <: TriBoolean]
       extends TriBoolean.TriBooleanImplicable[T]
-      with TriBoolean.TriBooleanDisjunctable[T]
-      with TriBoolean.TriBooleanNegatable[T]
+      with TriBoolean.TriBooleanBuilder[T]
   {
-    def implies(other : T) : T = this or other
+    def implies(other : T) : T =
+      {
+        import ConcreteTriBoolean._
+        makeTriBoolean(
+          (this.value) match {
+            case False => True
+            case True => other.value
+            case Unknown =>
+              if ( other.value == True ) True else Unknown
+          }
+        )
+      }
   }
 
   trait LukasiewiczImplication[T <: TriBoolean]
