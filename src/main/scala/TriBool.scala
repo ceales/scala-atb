@@ -21,7 +21,7 @@ package atb
   object TriBoolean
   {
 
-    abstract trait TriBooleanNegatable[T <: TriBoolean]
+    abstract trait Negatable[T <: TriBoolean]
         extends TriBoolean
     {
       def not: T
@@ -29,25 +29,25 @@ package atb
       def unary_! = not
     }
 
-    abstract trait TriBooleanConjunctable[T <: TriBoolean]
+    abstract trait Conjunctable[T <: TriBoolean]
         extends TriBoolean
     {
       def and(other: T): T
     }
 
-    abstract trait TriBooleanDisjunctable[T <: TriBoolean]
+    abstract trait Disjunctable[T <: TriBoolean]
         extends TriBoolean
     {
       def or(other: T): T
     }
 
-    abstract trait TriBooleanImplicable[T <: TriBoolean]
+    abstract trait Implicable[T <: TriBoolean]
         extends TriBoolean
     {
       def implies(other: T): T
     }
 
-    abstract trait TriBooleanBuilder[T <: TriBoolean]
+    abstract trait Builder[T <: TriBoolean]
     {
       def makeTriBoolean(x : ConcreteTriBoolean) : T
     }
@@ -68,8 +68,8 @@ package atb
   }
 
   trait KleeneNegation[T <: TriBoolean]
-      extends TriBoolean.TriBooleanNegatable[T]
-      with TriBoolean.TriBooleanBuilder[T]
+      extends TriBoolean.Negatable[T]
+      with TriBoolean.Builder[T]
   {
     def not : T =
     {
@@ -85,8 +85,8 @@ package atb
   }
 
   trait KleeneConjunction[T <: TriBoolean]
-      extends TriBoolean.TriBooleanConjunctable[T]
-      with TriBoolean.TriBooleanBuilder[T]
+      extends TriBoolean.Conjunctable[T]
+      with TriBoolean.Builder[T]
   {
     def and(other : T) : T =
     {
@@ -103,8 +103,8 @@ package atb
   }
 
   trait KleeneDisjunction[T <: TriBoolean]
-      extends TriBoolean.TriBooleanDisjunctable[T]
-      with TriBoolean.TriBooleanBuilder[T]
+      extends TriBoolean.Disjunctable[T]
+      with TriBoolean.Builder[T]
   {
     def or(other : T) : T =
     {
@@ -121,8 +121,8 @@ package atb
   }
 
   trait KleeneImplication[T <: TriBoolean]
-      extends TriBoolean.TriBooleanImplicable[T]
-      with TriBoolean.TriBooleanBuilder[T]
+      extends TriBoolean.Implicable[T]
+      with TriBoolean.Builder[T]
   {
     def implies(other : T) : T =
       {
@@ -139,8 +139,8 @@ package atb
   }
 
   trait LukasiewiczImplication[T <: TriBoolean]
-      extends TriBoolean.TriBooleanImplicable[T]
-      with TriBoolean.TriBooleanBuilder[T]
+      extends TriBoolean.Implicable[T]
+      with TriBoolean.Builder[T]
   {
     def implies(other : T) : T =
     {
@@ -169,7 +169,7 @@ package atb
       with KleeneConjunction[KleeneBoolean]
       with KleeneDisjunction[KleeneBoolean]
       with KleeneImplication[KleeneBoolean]
-      with TriBoolean.TriBooleanBuilder[KleeneBoolean]
+      with TriBoolean.Builder[KleeneBoolean]
   {
 
     override def equals(other: Any) =
@@ -199,7 +199,7 @@ package atb
       with KleeneConjunction[LukasiewiczBoolean]
       with KleeneDisjunction[LukasiewiczBoolean]
       with LukasiewiczImplication[LukasiewiczBoolean]
-      with TriBoolean.TriBooleanBuilder[LukasiewiczBoolean]
+      with TriBoolean.Builder[LukasiewiczBoolean]
   {
     override def equals(other: Any) =
       other match {
