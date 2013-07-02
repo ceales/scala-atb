@@ -4,8 +4,8 @@
 // distributed under the MIT License (MIT)
 //
 
-package atb
-{
+package atb.tribool {
+
 
   object ConcreteTriBoolean {
     case object True extends ConcreteTriBoolean
