@@ -158,71 +158,71 @@ package atb
     }
   }
 
-  object KleeneBoolean
+  object KleeneTriBoolean
   {
-    case object True extends KleeneBoolean(ConcreteTriBoolean.True)
-    case object False extends KleeneBoolean(ConcreteTriBoolean.False)
-    case object Unknown extends KleeneBoolean(ConcreteTriBoolean.Unknown)
+    case object True extends KleeneTriBoolean(ConcreteTriBoolean.True)
+    case object False extends KleeneTriBoolean(ConcreteTriBoolean.False)
+    case object Unknown extends KleeneTriBoolean(ConcreteTriBoolean.Unknown)
   }
 
-  sealed abstract class KleeneBoolean(value : ConcreteTriBoolean)
+  sealed abstract class KleeneTriBoolean(value : ConcreteTriBoolean)
       extends TriBoolean(value)
-      with KleeneNegation[KleeneBoolean]
-      with KleeneConjunction[KleeneBoolean]
-      with KleeneDisjunction[KleeneBoolean]
-      with KleeneImplication[KleeneBoolean]
-      with TriBoolean.Builder[KleeneBoolean]
+      with KleeneNegation[KleeneTriBoolean]
+      with KleeneConjunction[KleeneTriBoolean]
+      with KleeneDisjunction[KleeneTriBoolean]
+      with KleeneImplication[KleeneTriBoolean]
+      with TriBoolean.Builder[KleeneTriBoolean]
   {
 
     override def equals(other: Any) =
       other match {
-        case that: KleeneBoolean => super.equals(other)
+        case that: KleeneTriBoolean => super.equals(other)
         case _ => false
       }
 
-    def makeTriBoolean(x : ConcreteTriBoolean) : KleeneBoolean =
+    def makeTriBoolean(x : ConcreteTriBoolean) : KleeneTriBoolean =
       (x) match {
-        case ConcreteTriBoolean.True => KleeneBoolean.True
-        case ConcreteTriBoolean.False => KleeneBoolean.False
-        case ConcreteTriBoolean.Unknown => KleeneBoolean.Unknown
+        case ConcreteTriBoolean.True => KleeneTriBoolean.True
+        case ConcreteTriBoolean.False => KleeneTriBoolean.False
+        case ConcreteTriBoolean.Unknown => KleeneTriBoolean.Unknown
       }
   }
 
-  object LukasiewiczBoolean
+  object LukasiewiczTriBoolean
   {
-    case object True extends LukasiewiczBoolean(ConcreteTriBoolean.True)
-    case object False extends LukasiewiczBoolean(ConcreteTriBoolean.False)
-    case object Unknown extends LukasiewiczBoolean(ConcreteTriBoolean.Unknown)
+    case object True extends LukasiewiczTriBoolean(ConcreteTriBoolean.True)
+    case object False extends LukasiewiczTriBoolean(ConcreteTriBoolean.False)
+    case object Unknown extends LukasiewiczTriBoolean(ConcreteTriBoolean.Unknown)
   }
 
-  sealed abstract class LukasiewiczBoolean(value : ConcreteTriBoolean)
+  sealed abstract class LukasiewiczTriBoolean(value : ConcreteTriBoolean)
       extends TriBoolean(value)
-      with KleeneNegation[LukasiewiczBoolean]
-      with KleeneConjunction[LukasiewiczBoolean]
-      with KleeneDisjunction[LukasiewiczBoolean]
-      with LukasiewiczImplication[LukasiewiczBoolean]
-      with TriBoolean.Builder[LukasiewiczBoolean]
+      with KleeneNegation[LukasiewiczTriBoolean]
+      with KleeneConjunction[LukasiewiczTriBoolean]
+      with KleeneDisjunction[LukasiewiczTriBoolean]
+      with LukasiewiczImplication[LukasiewiczTriBoolean]
+      with TriBoolean.Builder[LukasiewiczTriBoolean]
   {
     override def equals(other: Any) =
       other match {
-        case that: LukasiewiczBoolean => super.equals(other)
+        case that: LukasiewiczTriBoolean => super.equals(other)
         case _ => false
       }
 
-    def makeTriBoolean(x : ConcreteTriBoolean) : LukasiewiczBoolean =
+    def makeTriBoolean(x : ConcreteTriBoolean) : LukasiewiczTriBoolean =
       (x) match {
-        case ConcreteTriBoolean.True => LukasiewiczBoolean.True
-        case ConcreteTriBoolean.False => LukasiewiczBoolean.False
-        case ConcreteTriBoolean.Unknown => LukasiewiczBoolean.Unknown
+        case ConcreteTriBoolean.True => LukasiewiczTriBoolean.True
+        case ConcreteTriBoolean.False => LukasiewiczTriBoolean.False
+        case ConcreteTriBoolean.Unknown => LukasiewiczTriBoolean.Unknown
       }
 
-    def isNotFalse : LukasiewiczBoolean =
+    def isNotFalse : LukasiewiczTriBoolean =
       !this implies this
 
-    def isTrue : LukasiewiczBoolean =
+    def isTrue : LukasiewiczTriBoolean =
       !((!this).isNotFalse)
 
-    def isUnknown : LukasiewiczBoolean =
+    def isUnknown : LukasiewiczTriBoolean =
       (!isNotFalse) and (!isTrue)
   }
 
