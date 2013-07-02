@@ -6,14 +6,13 @@
 
 package atb.tribool {
 
-
-  object ConcreteTriBoolean {
-    case object True extends ConcreteTriBoolean
-    case object False extends ConcreteTriBoolean
-    case object Unknown extends ConcreteTriBoolean
+  private object TriBoolRepresentation {
+    case object True extends TriBoolRepresentation
+    case object False extends TriBoolRepresentation
+    case object Unknown extends TriBoolRepresentation
   }
 
-  abstract sealed trait ConcreteTriBoolean
+  abstract sealed trait TriBoolRepresentation
 
   object TriBoolean {
 
@@ -39,12 +38,11 @@ package atb.tribool {
     }
 
     abstract trait Builder[A <: TriBoolean] {
-      def makeTriBoolean(x: ConcreteTriBoolean): A
+      def makeTriBoolean(x: TriBoolRepresentation): A
     }
-
   }
 
-  class TriBoolean(val value: ConcreteTriBoolean) {
+  class TriBoolean(val value: TriBoolRepresentation) {
     override def equals(other: Any) =
       other match {
         case that: TriBoolean => value == that.value
@@ -61,7 +59,7 @@ package atb.tribool {
     this: A with TriBoolean.Builder[A] =>
 
     def not: A = {
-      import ConcreteTriBoolean._
+      import TriBoolRepresentation._
       makeTriBoolean (
         value match {
           case True => False
@@ -78,7 +76,7 @@ package atb.tribool {
     this: A with TriBoolean.Builder[A] =>
 
     def and(other: A): A = {
-      import ConcreteTriBoolean._
+      import TriBoolRepresentation._
       makeTriBoolean(
         value match {
           case True => other.value
@@ -96,7 +94,7 @@ package atb.tribool {
     this: A with TriBoolean.Builder[A] =>
 
     def or(other: A): A = {
-      import ConcreteTriBoolean._
+      import TriBoolRepresentation._
       makeTriBoolean(
         value match {
           case True => True
@@ -133,7 +131,7 @@ package atb.tribool {
     this: A with TriBoolean.Builder[A] =>
 
     def implies(other: A): A = {
-      import ConcreteTriBoolean._
+      import TriBoolRepresentation._
       makeTriBoolean(
         value match {
           case False => True
@@ -146,12 +144,12 @@ package atb.tribool {
   }
 
   object KleeneTriBoolean {
-    case object True extends KleeneTriBoolean(ConcreteTriBoolean.True)
-    case object False extends KleeneTriBoolean(ConcreteTriBoolean.False)
-    case object Unknown extends KleeneTriBoolean(ConcreteTriBoolean.Unknown)
+    case object True extends KleeneTriBoolean(TriBoolRepresentation.True)
+    case object False extends KleeneTriBoolean(TriBoolRepresentation.False)
+    case object Unknown extends KleeneTriBoolean(TriBoolRepresentation.Unknown)
   }
 
-  sealed abstract class KleeneTriBoolean(value: ConcreteTriBoolean)
+  sealed abstract class KleeneTriBoolean(value: TriBoolRepresentation)
       extends TriBoolean(value)
       with KleeneNegation[KleeneTriBoolean]
       with KleeneConjunction[KleeneTriBoolean]
@@ -165,21 +163,21 @@ package atb.tribool {
         case _ => false
       }
 
-    def makeTriBoolean(x: ConcreteTriBoolean): KleeneTriBoolean =
+    def makeTriBoolean(x: TriBoolRepresentation): KleeneTriBoolean =
       x match {
-        case ConcreteTriBoolean.True => KleeneTriBoolean.True
-        case ConcreteTriBoolean.False => KleeneTriBoolean.False
-        case ConcreteTriBoolean.Unknown => KleeneTriBoolean.Unknown
+        case TriBoolRepresentation.True => KleeneTriBoolean.True
+        case TriBoolRepresentation.False => KleeneTriBoolean.False
+        case TriBoolRepresentation.Unknown => KleeneTriBoolean.Unknown
       }
   }
 
   object LukasiewiczTriBoolean {
-    case object True extends LukasiewiczTriBoolean(ConcreteTriBoolean.True)
-    case object False extends LukasiewiczTriBoolean(ConcreteTriBoolean.False)
-    case object Unknown extends LukasiewiczTriBoolean(ConcreteTriBoolean.Unknown)
+    case object True extends LukasiewiczTriBoolean(TriBoolRepresentation.True)
+    case object False extends LukasiewiczTriBoolean(TriBoolRepresentation.False)
+    case object Unknown extends LukasiewiczTriBoolean(TriBoolRepresentation.Unknown)
   }
 
-  sealed abstract class LukasiewiczTriBoolean(value: ConcreteTriBoolean)
+  sealed abstract class LukasiewiczTriBoolean(value: TriBoolRepresentation)
       extends TriBoolean(value)
       with KleeneNegation[LukasiewiczTriBoolean]
       with KleeneConjunction[LukasiewiczTriBoolean]
@@ -193,11 +191,11 @@ package atb.tribool {
         case _ => false
       }
 
-    def makeTriBoolean(x: ConcreteTriBoolean): LukasiewiczTriBoolean =
+    def makeTriBoolean(x: TriBoolRepresentation): LukasiewiczTriBoolean =
       x match {
-        case ConcreteTriBoolean.True => LukasiewiczTriBoolean.True
-        case ConcreteTriBoolean.False => LukasiewiczTriBoolean.False
-        case ConcreteTriBoolean.Unknown => LukasiewiczTriBoolean.Unknown
+        case TriBoolRepresentation.True => LukasiewiczTriBoolean.True
+        case TriBoolRepresentation.False => LukasiewiczTriBoolean.False
+        case TriBoolRepresentation.Unknown => LukasiewiczTriBoolean.Unknown
       }
 
     def isNotFalse: LukasiewiczTriBoolean =
