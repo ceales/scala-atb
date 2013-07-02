@@ -22,27 +22,27 @@ package atb
   {
 
     abstract trait Negatable[T <: TriBoolean]
-        extends TriBoolean
     {
+      this :T =>
       def not: T
       def unary_! = not
     }
 
     abstract trait Conjunctable[T <: TriBoolean]
-        extends TriBoolean
     {
+      this :T =>
       def and(other: T): T
     }
 
     abstract trait Disjunctable[T <: TriBoolean]
-        extends TriBoolean
     {
+      this :T =>
       def or(other: T): T
     }
 
     abstract trait Implicable[T <: TriBoolean]
-        extends TriBoolean
     {
+      this :T =>
       def implies(other: T): T
     }
 
@@ -63,13 +63,12 @@ package atb
 
     override def hashCode = value.hashCode
     override def toString = value.toString
-
   }
 
   trait KleeneNegation[T <: TriBoolean]
       extends TriBoolean.Negatable[T]
   {
-    this : TriBoolean.Builder[T] =>
+    this : T with TriBoolean.Builder[T] =>
 
     def not : T =
     {
@@ -87,7 +86,7 @@ package atb
   trait KleeneConjunction[T <: TriBoolean]
       extends TriBoolean.Conjunctable[T]
   {
-    this : TriBoolean.Builder[T] =>
+    this : T with TriBoolean.Builder[T] =>
 
     def and(other : T) : T =
     {
@@ -106,7 +105,7 @@ package atb
   trait KleeneDisjunction[T <: TriBoolean]
       extends TriBoolean.Disjunctable[T]
   {
-    this : TriBoolean.Builder[T] =>
+    this : T with TriBoolean.Builder[T] =>
 
     def or(other : T) : T =
     {
@@ -122,29 +121,28 @@ package atb
     }
   }
 
-  trait KleeneImplication[T <: TriBoolean]
-      extends TriBoolean.Implicable[T]
+  trait AnalogyImplication[
+    T <: TriBoolean
+        with TriBoolean.Disjunctable[T]
+        with TriBoolean.Negatable[T]]
   {
-    this : TriBoolean.Builder[T] =>
+    this : T =>
+    def implies(other : T) : T = !this or other
+  }
 
-    def implies(other : T) : T =
-      {
-        import ConcreteTriBoolean._
-        makeTriBoolean(
-          (this.value) match {
-            case False => True
-            case True => other.value
-            case Unknown =>
-              if ( other.value == True ) True else Unknown
-          }
-        )
-      }
+  trait KleeneImplication[
+    T <: TriBoolean
+        with KleeneDisjunction[T]
+        with KleeneNegation[T]]
+      extends AnalogyImplication[T]
+  {
+    this : T =>
   }
 
   trait LukasiewiczImplication[T <: TriBoolean]
       extends TriBoolean.Implicable[T]
   {
-    this : TriBoolean.Builder[T] =>
+    this : T with TriBoolean.Builder[T] =>
 
     def implies(other : T) : T =
     {
