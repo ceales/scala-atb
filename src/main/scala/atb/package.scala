@@ -4,10 +4,8 @@
 // distributed under the MIT License (MIT)
 //
 
-package abt
-
 /**
-  *
+  *  Some documetnation for atb
   */
-package object tribool {
+package object atb {
 }

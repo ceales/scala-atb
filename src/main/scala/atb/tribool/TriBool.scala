@@ -6,13 +6,31 @@
 
 package atb.tribool {
 
-  private object TriBoolRepresentation {
+  /** An abstract type to hold the physical
+    * representations of the three different
+    * values of a tribool
+    */
+  abstract sealed trait TriBoolRepresentation
+
+  /** The physical values representing the three
+    * different truth values of a tribool
+    */
+  object TriBoolRepresentation {
     case object True extends TriBoolRepresentation
     case object False extends TriBoolRepresentation
     case object Unknown extends TriBoolRepresentation
   }
 
-  abstract sealed trait TriBoolRepresentation
+  class TriBoolean(val value: TriBoolRepresentation) {
+    override def equals(other: Any) =
+      other match {
+        case that: TriBoolean => value == that.value
+        case _ => false
+      }
+
+    override def hashCode = value.hashCode
+    override def toString = value.toString
+  }
 
   object TriBoolean {
 
@@ -40,17 +58,6 @@ package atb.tribool {
     abstract trait Builder[A <: TriBoolean] {
       def makeTriBoolean(x: TriBoolRepresentation): A
     }
-  }
-
-  class TriBoolean(val value: TriBoolRepresentation) {
-    override def equals(other: Any) =
-      other match {
-        case that: TriBoolean => value == that.value
-        case _ => false
-      }
-
-    override def hashCode = value.hashCode
-    override def toString = value.toString
   }
 
   trait KleeneNegation[A <: TriBoolean]
