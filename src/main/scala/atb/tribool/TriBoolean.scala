@@ -4,17 +4,26 @@
 // distributed under the MIT License (MIT)
 //
 
-package atb.tribool {
+package atb
+package tribool {
 
   /**
     * See [[atb.tribool.TriBoolean.Negatable]]
     */
-  class TriBoolean(val value: TriBoolRepresentation) {
+
+  abstract class TriBoolean(val value: TriBoolRepresentation) {
+
     override def equals(other: Any) =
       other match {
-        case that: TriBoolean => value == that.value
-        case _ => false
+        case that: TriBoolean =>
+          (that canEqual this) &&
+          (value == that.value)
+        case _ =>
+          false
       }
+
+    def canEqual(other: Any): Boolean =
+      other.isInstanceOf[TriBoolean]
 
     override def hashCode = value.hashCode
     override def toString = value.toString

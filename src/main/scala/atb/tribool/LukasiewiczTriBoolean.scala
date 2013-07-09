@@ -4,7 +4,8 @@
 // distributed under the MIT License (MIT)
 //
 
-package atb.tribool {
+package atb
+package tribool {
 
   trait LukasiewiczImplication[A <: TriBoolean]
       extends TriBoolean.Implicable[A] {
@@ -40,9 +41,15 @@ package atb.tribool {
 
     override def equals(other: Any) =
       other match {
-        case that: LukasiewiczTriBoolean => super.equals(other)
-        case _ => false
+        case that: LukasiewiczTriBoolean =>
+          (that canEqual this) &&
+          super.equals(that)
+        case _ =>
+          false
       }
+
+    override def canEqual(other: Any): Boolean =
+      other.isInstanceOf[LukasiewiczTriBoolean]
 
     def makeTriBoolean(x: TriBoolRepresentation): LukasiewiczTriBoolean =
       x match {

@@ -4,7 +4,8 @@
 // distributed under the MIT License (MIT)
 //
 
-package atb.tribool {
+package atb
+package tribool {
 
   trait KleeneNegation[A <: TriBoolean]
       extends TriBoolean.Negatable[A] {
@@ -84,9 +85,15 @@ package atb.tribool {
 
     override def equals(other: Any) =
       other match {
-        case that: KleeneTriBoolean => super.equals(other)
-        case _ => false
+        case that: KleeneTriBoolean =>
+          (that canEqual this) &&
+          super.equals(other)
+        case _ =>
+          false
       }
+
+    override def canEqual(other: Any): Boolean =
+      other.isInstanceOf[KleeneTriBoolean]
 
     def makeTriBoolean(x: TriBoolRepresentation): KleeneTriBoolean =
       x match {
