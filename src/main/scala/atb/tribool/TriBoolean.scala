@@ -28,11 +28,11 @@ package tribool {
       }
 
     /** canEqual is a helper method to allow the correct semantics of
-     * equals to be implemented in the hierarchy
-     *
-     * @see "Programming In Scala: A Comprehnsive Step-By-Step Guide"
-     * (Stairway book) chapter 30 - Object Equality
-     */
+      * equals to be implemented in the hierarchy
+      *
+      * @see "Programming In Scala: A Comprehnsive Step-By-Step Guide"
+      * (Stairway book) chapter 30 - Object Equality
+      */
 
     def canEqual(other: Any): Boolean =
       other.isInstanceOf[TriBoolean]
