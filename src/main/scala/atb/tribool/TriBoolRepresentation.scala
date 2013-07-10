@@ -10,6 +10,11 @@ package tribool {
   /** An abstract type to hold the physical
     * representations of the three different
     * values of a tribool
+    *
+    * There are only three instances of this class
+    *  - [[atb.tribool.TriBoolRepresentation.True]]
+    *  - [[atb.tribool.TriBoolRepresentation.False]]
+    *  - [[atb.tribool.TriBoolRepresentation.Unknown]]
     */
 
   abstract sealed trait TriBoolRepresentation
@@ -28,7 +33,6 @@ package tribool {
     case object True extends TriBoolRepresentation
     case object False extends TriBoolRepresentation
     case object Unknown extends TriBoolRepresentation
-
   }
 
 }
