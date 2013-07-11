@@ -7,61 +7,52 @@
 package atb
 package tribool {
 
-  trait KleeneNegation[A <: TriBoolean]
-      extends TriBoolean.Negatable[A] {
+  trait KleeneNegation[A <: TriBoolean[A]]
+      extends Negatable[A] {
 
-    this: A with TriBoolean.Builder[A] =>
+    this: A =>
 
     def not: A = {
-      import TriBoolRepresentation._
-      makeTriBoolean (
-        value match {
-          case True => False
-          case False => True
-          case Unknown => Unknown
-        }
-      )
+      this match {
+        case True => False
+        case False => True
+        case Unknown => Unknown
+      }
     }
   }
 
-  trait KleeneConjunction[A <: TriBoolean]
-      extends TriBoolean.Conjunctable[A] {
+  trait KleeneConjunction[A <: TriBoolean[A]]
+      extends Conjunctable[A] {
 
-    this: A with TriBoolean.Builder[A] =>
+    this: A =>
 
     def and(other: A): A = {
-      import TriBoolRepresentation._
-      makeTriBoolean(
-        value match {
-          case True => other.value
-          case False => False
-          case Unknown =>
-            if ( other.value == False ) False else Unknown
-        }
-      )
+      this match {
+        case True => other
+        case False => False
+        case Unknown =>
+          if ( other == False ) False else Unknown
+      }
     }
   }
 
-  trait KleeneDisjunction[A <: TriBoolean]
-      extends TriBoolean.Disjunctable[A] {
+  trait KleeneDisjunction[A <: TriBoolean[A]]
+      extends Disjunctable[A] {
 
-    this: A with TriBoolean.Builder[A] =>
+    this: A =>
 
     def or(other: A): A = {
-      import TriBoolRepresentation._
-      makeTriBoolean(
-        value match {
-          case True => True
-          case False => other.value
-          case Unknown =>
-            if ( other.value == True ) True else Unknown
-        }
-      )
+      this match {
+        case True => True
+        case False => other
+        case Unknown =>
+          if ( other == True ) True else Unknown
+      }
     }
   }
 
   trait KleeneImplication[
-    A <: TriBoolean
+    A <: TriBoolean[A]
         with KleeneDisjunction[A]
         with KleeneNegation[A]]
       extends AnalogyImplication[A] {
@@ -70,37 +61,21 @@ package tribool {
   }
 
   object KleeneTriBoolean {
-    case object True extends KleeneTriBoolean(TriBoolRepresentation.True)
-    case object False extends KleeneTriBoolean(TriBoolRepresentation.False)
-    case object Unknown extends KleeneTriBoolean(TriBoolRepresentation.Unknown)
+    case object True extends KleeneTriBoolean
+    case object False extends KleeneTriBoolean
+    case object Unknown extends KleeneTriBoolean
   }
 
-  sealed abstract class KleeneTriBoolean(value: TriBoolRepresentation)
-      extends TriBoolean(value)
+  sealed abstract class KleeneTriBoolean
+      extends TriBoolean[KleeneTriBoolean]
       with KleeneNegation[KleeneTriBoolean]
       with KleeneConjunction[KleeneTriBoolean]
       with KleeneDisjunction[KleeneTriBoolean]
-      with KleeneImplication[KleeneTriBoolean]
-      with TriBoolean.Builder[KleeneTriBoolean] {
+      with KleeneImplication[KleeneTriBoolean] {
 
-    override def equals(other: Any) =
-      other match {
-        case that: KleeneTriBoolean =>
-          (that canEqual this) &&
-          super.equals(other)
-        case _ =>
-          false
-      }
-
-    override def canEqual(other: Any): Boolean =
-      other.isInstanceOf[KleeneTriBoolean]
-
-    def makeTriBoolean(x: TriBoolRepresentation): KleeneTriBoolean =
-      x match {
-        case TriBoolRepresentation.True => KleeneTriBoolean.True
-        case TriBoolRepresentation.False => KleeneTriBoolean.False
-        case TriBoolRepresentation.Unknown => KleeneTriBoolean.Unknown
-      }
+    lazy protected val True = KleeneTriBoolean.True
+    lazy protected val False = KleeneTriBoolean.False
+    lazy protected val Unknown = KleeneTriBoolean.Unknown
   }
 
 

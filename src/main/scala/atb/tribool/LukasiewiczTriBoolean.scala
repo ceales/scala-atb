@@ -7,65 +7,61 @@
 package atb
 package tribool {
 
-  trait LukasiewiczImplication[A <: TriBoolean]
-      extends TriBoolean.Implicable[A] {
+  trait LukasiewiczImplication[A <: TriBoolean[A]]
+      extends Implicable[A] {
 
-    this: A with TriBoolean.Builder[A] =>
+    this: A =>
 
     def implies(other: A): A = {
-      import TriBoolRepresentation._
-      makeTriBoolean(
-        value match {
-          case False => True
-          case True => other.value
-          case Unknown =>
-            if ( other.value == False ) Unknown else True
-        }
-      )
+      this match {
+        case False => True
+        case True => other
+        case Unknown =>
+          if ( other == False ) Unknown else True
+      }
     }
   }
 
-  object LukasiewiczTriBoolean {
-    case object True extends LukasiewiczTriBoolean(TriBoolRepresentation.True)
-    case object False extends LukasiewiczTriBoolean(TriBoolRepresentation.False)
-    case object Unknown extends LukasiewiczTriBoolean(TriBoolRepresentation.Unknown)
+  object LukasiewiczUnaryOperators {
+
+    def isNotFalse[
+      A <: TriBoolean[A]
+          with Negatable[A]
+          with Implicable[A]](x: A): A =
+      !x implies x
+
+    def isTrue[
+      A <: TriBoolean[A]
+          with Negatable[A]
+          with Implicable[A]](x: A): A =
+      !(isNotFalse[A](!x))
+
+    def isUnknown[
+      A <: TriBoolean[A]
+          with Negatable[A]
+          with Implicable[A]
+          with Conjunctable[A]] (x: A): A =
+      !isNotFalse[A](x) and !isTrue[A](x)
+
   }
 
-  sealed abstract class LukasiewiczTriBoolean(value: TriBoolRepresentation)
-      extends TriBoolean(value)
+  object LukasiewiczTriBoolean {
+    case object True extends LukasiewiczTriBoolean
+    case object False extends LukasiewiczTriBoolean
+    case object Unknown extends LukasiewiczTriBoolean
+  }
+
+  sealed abstract class LukasiewiczTriBoolean
+      extends TriBoolean[LukasiewiczTriBoolean]
       with KleeneNegation[LukasiewiczTriBoolean]
       with KleeneConjunction[LukasiewiczTriBoolean]
       with KleeneDisjunction[LukasiewiczTriBoolean]
-      with LukasiewiczImplication[LukasiewiczTriBoolean]
-      with TriBoolean.Builder[LukasiewiczTriBoolean] {
+      with LukasiewiczImplication[LukasiewiczTriBoolean] {
 
-    override def equals(other: Any) =
-      other match {
-        case that: LukasiewiczTriBoolean =>
-          (that canEqual this) &&
-          super.equals(that)
-        case _ =>
-          false
-      }
+    lazy protected val True = LukasiewiczTriBoolean.True
+    lazy protected val False = LukasiewiczTriBoolean.False
+    lazy protected val Unknown = LukasiewiczTriBoolean.Unknown
 
-    override def canEqual(other: Any): Boolean =
-      other.isInstanceOf[LukasiewiczTriBoolean]
-
-    def makeTriBoolean(x: TriBoolRepresentation): LukasiewiczTriBoolean =
-      x match {
-        case TriBoolRepresentation.True => LukasiewiczTriBoolean.True
-        case TriBoolRepresentation.False => LukasiewiczTriBoolean.False
-        case TriBoolRepresentation.Unknown => LukasiewiczTriBoolean.Unknown
-      }
-
-    def isNotFalse: LukasiewiczTriBoolean =
-      !this implies this
-
-    def isTrue: LukasiewiczTriBoolean =
-      !((!this).isNotFalse)
-
-    def isUnknown: LukasiewiczTriBoolean =
-      (!isNotFalse) and (!isTrue)
   }
 
 }
