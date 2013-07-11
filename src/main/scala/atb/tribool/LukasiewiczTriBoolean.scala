@@ -51,7 +51,7 @@ package tribool {
     case object Unknown extends LukasiewiczTriBoolean
   }
 
-  sealed abstract class LukasiewiczTriBoolean
+  sealed abstract class LukasiewiczTriBoolean private()
       extends TriBoolean[LukasiewiczTriBoolean]
       with KleeneNegation[LukasiewiczTriBoolean]
       with KleeneConjunction[LukasiewiczTriBoolean]

@@ -66,7 +66,7 @@ package tribool {
     case object Unknown extends KleeneTriBoolean
   }
 
-  sealed abstract class KleeneTriBoolean
+  sealed abstract class KleeneTriBoolean private()
       extends TriBoolean[KleeneTriBoolean]
       with KleeneNegation[KleeneTriBoolean]
       with KleeneConjunction[KleeneTriBoolean]
