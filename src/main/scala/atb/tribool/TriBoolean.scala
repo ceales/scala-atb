@@ -80,9 +80,10 @@ package tribool {
 
   trait AnalogyImplication[
     A <: TriBoolean[A]
-        with Disjunctable[A]] {
+        with Disjunctable[A]
+        with Negatable[A]] {
 
-    this: Negatable[A] =>
+    this: A =>
 
     def implies(other: A): A = !this or other
   }
