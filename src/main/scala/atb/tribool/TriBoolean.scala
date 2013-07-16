@@ -102,7 +102,8 @@ package tribool {
   trait AnalogyImplication[
     A <: TriBoolean[A]
         with Disjunctable[A]
-        with Negatable[A]] {
+        with Negatable[A]]
+      extends Implicable[A] {
 
     this: A =>
 
