@@ -30,6 +30,9 @@ package atb
   *  - Kleene 3-valued logic [[atb.tribool.KleeneTriBoolean]]
   *  - Lukasiewicz logic [[atb.tribool.LukasiewiczTriBoolean]]
   *
+  * The implementation has a certain charm, I should probably try and write up
+  * a blog post or similar.
+  *
   * A sub-package of [[atb]]
   *
   * ==References==

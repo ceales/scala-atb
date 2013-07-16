@@ -25,6 +25,15 @@
 package atb
 package tribool {
 
+  /**
+    * The natural extension of Negation to three valed logic.
+    *  - not `True` == `False`
+    *  - not `False` == `True`
+    *  - not `Unknown` == `Unknown`
+    *
+    * @tparam A the implementing [[TriBoolean]] Class
+    */
+
   trait KleeneNegation[A <: TriBoolean[A]]
       extends Negatable[A] {
 
@@ -38,6 +47,20 @@ package tribool {
       }
     }
   }
+
+  /**
+    * An extension of `and` from two to three valued logic.
+    *
+    * The idea, is that `Unknown` is actually a concrete `True` or `False` it
+    * is just not known which one.
+    *
+    *  - `True and x` == `x`
+    *  - `False and  x` == `False`
+    *  - `Unknown and Unknown` == `Unknown`
+    *  - `Unknown and x` == `x and Unknown`
+    *
+    * @tparam A the implementing [[TriBoolean]] Class
+    */
 
   trait KleeneConjunction[A <: TriBoolean[A]]
       extends Conjunctable[A] {
@@ -54,6 +77,20 @@ package tribool {
     }
   }
 
+  /**
+    * An extension of `or` from two to three valued logic.
+    *
+    * The idea, is that `Unknown` is actually a concrete `True` or `False` it
+    * is just not known which one.
+    *
+    *  - `True or x` == `True`
+    *  - `False or x` == `x`
+    *  - `Unknown or Unknown` == `Unknown`
+    *  - `Unknown or x` == `x or Unknown`
+    *
+    * @tparam A the implementing [[TriBoolean]] Class
+    */
+
   trait KleeneDisjunction[A <: TriBoolean[A]]
       extends Disjunctable[A] {
 
@@ -69,6 +106,21 @@ package tribool {
     }
   }
 
+  /**
+    * Analogy Implication, with the implemetation of the two supporting
+    * operations constrained to be the Kleene implementations:
+    *  - `Disjunctable[A]` == `KleeneDisjunction[A]`
+    *  - `Negatable[A]` == `KleeneNegation[A]`
+    *
+    * @see [[Disjunctable]]
+    * @see [[Negatable]]
+    * @see [[KleeneDisjunction]]
+    * @see [[KleeneNegation]]
+    * @see [[AnalogyImplication]]
+    *
+    * @tparam A the implementing [[TriBoolean]] Class
+    */
+
   trait KleeneImplication[
     A <: TriBoolean[A]
         with KleeneDisjunction[A]
@@ -78,11 +130,38 @@ package tribool {
     this: A =>
   }
 
+  /**
+    * The Companion object of [[KleeneTriBoolean]], holds the three concrete
+    * instances: `True`, `False`, and `Unknown`, each an instance and
+    * sub-object of [[KleeneTriBoolean]]
+    */
+
   object KleeneTriBoolean {
+
+    /**
+      * The `True` value for [[KleeneTriBoolean]]
+      */
+
     case object True extends KleeneTriBoolean
+
+    /**
+      * The `False` value for [[KleeneTriBoolean]]
+      */
+
     case object False extends KleeneTriBoolean
+
+    /**
+      * The `Unknown` value for [[KleeneTriBoolean]]
+      */
+
     case object Unknown extends KleeneTriBoolean
   }
+
+  /**
+    * Assemblege of a working [[TriBoolean]] with the Kleene semantics.
+    *
+    * @see [[http://en.wikipedia.org/wiki/Tribool#Kleene_logic]]
+    */
 
   sealed abstract class KleeneTriBoolean private()
       extends TriBoolean[KleeneTriBoolean]
