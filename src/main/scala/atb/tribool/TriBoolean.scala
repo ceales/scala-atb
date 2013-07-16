@@ -45,7 +45,7 @@ package tribool {
 
   /**
     * Negatable captures the notion of a [[TriBoolean]] that
-    * can be negated, both with the property `not` and unary `!`
+    * can be negated, both utsing the property `not` and unary `!`
     *
     * @tparam A the implementing [[TriBoolean]] Class
     */
@@ -57,7 +57,7 @@ package tribool {
 
   /**
     * Conjunctable captures the notion of a [[TriBoolean]] that
-    * can be conjoined, with the binary operator `and`
+    * can be conjoined, utsing the binary operator `and`
     *
     * @tparam A the implementing [[TriBoolean]] Class
     */
@@ -68,7 +68,7 @@ package tribool {
 
   /**
     * Disjunctable captures the notion of a [[TriBoolean]] that
-    * can be disjoined, with the binary operator `or`
+    * can be disjoined, utsing the binary operator `or`
     *
     * @tparam A the implementing [[TriBoolean]] Class
     */
@@ -94,6 +94,9 @@ package tribool {
     * Carried over from the two-value logic.
     *
     * `a implies b === !a or b`
+    *
+    * @tparam A the implementing [[TriBoolean]] Class. It must
+    * be [[Disjunctable]] and [[Negatable]] for the implementation.
     */
 
   trait AnalogyImplication[
