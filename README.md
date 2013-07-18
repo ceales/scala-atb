@@ -1,17 +1,24 @@
 #scala-atb (Scala All-Things-Boolean)
 
-A collection of type and algorithms related to things Boolean
+A collection of types and algorithms in scala related to things Boolean
 
 ## Motivation
-1. Boolean functions and algebra prevade computer science and
-   although they often appear obvious the implementation of different
-   representations and algorithms can be tricky.
 
-## Goals
-1. To provide a tool kit of things Boolean.
-2. Explore different aspects of Scala.
+Boolean functions and algebra prevade computer science and
+although they often appear obvious the implementation of different
+representations and algorithms can be tricky.
+
+## Subpackages
+
+1. atb.tribool  A package containing basic types for three valued logic. In
+particular implementations of:
+  * Kleene 3-valued logic
+  * Lukasiewicz logic
 
 ## Reference
+
+1.  Three Valued Logic
+    1. [Wikipedia Tribool](http://en.wikipedia.org/wiki/Tribool)
 
 ## Legal
 
