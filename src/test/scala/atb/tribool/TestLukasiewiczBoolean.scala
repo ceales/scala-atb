@@ -26,15 +26,15 @@ import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 
-import atb.tribool.KleeneTriBoolean
+import atb.tribool.LukasiewiczTriBoolean
 
-class TestKleeneTriBoolean
+class TestLukasiewiczTriBoolean
     extends FunSpec
     with ShouldMatchers
     with TableDrivenPropertyChecks
 {
 
-  import KleeneTriBoolean._
+  import LukasiewiczTriBoolean._
 
   val negationTable = Table (
     ("value" , "negation" ),
@@ -71,43 +71,43 @@ class TestKleeneTriBoolean
     (False, False,  True),
     (False, Unknown, True),
     (False, True, True),
-    (Unknown, Unknown, Unknown),
+    (Unknown, Unknown, True),
     (Unknown, True, True),
     (Unknown, False, Unknown)
   )
 
-  describe("A KleeneTriBoolean") {
+  describe("A LukasiewiczTriBoolean") {
 
     it("Should be negatable") {
       forAll (negationTable) {
-        ( value: KleeneTriBoolean,
-          negation: KleeneTriBoolean ) =>
+        ( value: LukasiewiczTriBoolean,
+          negation: LukasiewiczTriBoolean ) =>
         !value should equal (negation)
       }
     }
     it("Should be conjoinable") {
       forAll (andTable) {
-        ( a: KleeneTriBoolean,
-          b: KleeneTriBoolean,
-          conjunction: KleeneTriBoolean ) =>
+        ( a: LukasiewiczTriBoolean,
+          b: LukasiewiczTriBoolean,
+          conjunction: LukasiewiczTriBoolean ) =>
         (a and b) should equal (conjunction)
         (b and a) should equal (conjunction)
       }
     }
     it("Should be disjoinable") {
       forAll (orTable) {
-        ( a: KleeneTriBoolean,
-          b: KleeneTriBoolean,
-          disjunction: KleeneTriBoolean ) =>
+        ( a: LukasiewiczTriBoolean,
+          b: LukasiewiczTriBoolean,
+          disjunction: LukasiewiczTriBoolean ) =>
         (a or b) should equal (disjunction)
         (b or a) should equal (disjunction)
       }
     }
     it("Should be implicable") {
       forAll (impliesTable) {
-        ( a: KleeneTriBoolean,
-          b: KleeneTriBoolean,
-          implication: KleeneTriBoolean ) =>
+        ( a: LukasiewiczTriBoolean,
+          b: LukasiewiczTriBoolean,
+          implication: LukasiewiczTriBoolean ) =>
         (a implies b) should equal (implication)
       }
     }
