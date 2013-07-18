@@ -29,7 +29,7 @@
   *
   * ==Subpackages==
   *
-  *  1. [[atb.tribool]] A package containing basic type for
+  *  1. [[atb.tribool]] A package containing basic types for
   *      three valued logic. In particular implementations of:
   *      - Kleene 3-valued logic [[atb.tribool.KleeneTriBoolean]]
   *      - Lukasiewicz logic [[atb.tribool.LukasiewiczTriBoolean]]
