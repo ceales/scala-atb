@@ -155,6 +155,13 @@ package tribool {
       */
 
     case object Unknown extends KleeneTriBoolean
+
+    /**
+      * A list containing the three values
+      */
+
+    val values = List(True,False,Unknown)
+
   }
 
   /**

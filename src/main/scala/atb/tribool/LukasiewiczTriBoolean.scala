@@ -122,6 +122,13 @@ package tribool {
       */
 
     case object Unknown extends LukasiewiczTriBoolean
+
+    /**
+      * A list containing the three values
+      */
+
+    val values = List(True,False,Unknown)
+
   }
 
   /**
