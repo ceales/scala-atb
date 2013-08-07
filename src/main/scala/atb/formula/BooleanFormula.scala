@@ -67,6 +67,15 @@ package formula {
           case Or(l,r) => 1+Math.max(depth(l),depth(r))
         }
 
+    def size(formula: BooleanFormula): Int =
+        (formula) match {
+          case Value(_) => 1
+          case Variable(_) => 1
+          case Not(f) => 1+size(f)
+          case And(l,r) => 1+size(l)+size(r)
+          case Or(l,r) => 1+size(l)+size(r)
+        }
+
     def atoms(formula: BooleanFormula): Set[BooleanFormula] =
         (formula) match {
           case x if isAtom(x) => Set(x)
