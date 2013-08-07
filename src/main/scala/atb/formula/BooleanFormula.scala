@@ -84,13 +84,6 @@ package formula {
           case Or(l,r) => atoms(l) union atoms(r)
         }
 
-    def isConjunctionOfAtoms(formula: BooleanFormula): Boolean =
-      (formula) match {
-        case x if isAtom(x) => true
-        case And(l,r) => isConjunctionOfAtoms(l) && isConjunctionOfAtoms(r)
-        case _ => false
-      }
-
     object Hierarchy {
 
       private def nextLevel(baseFormulae: Set[BooleanFormula]):
