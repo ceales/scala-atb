@@ -84,37 +84,6 @@ package formula {
           case Or(l,r) => atoms(l) union atoms(r)
         }
 
-    object Hierarchy {
-
-      private def nextLevel(baseFormulae: Set[BooleanFormula]):
-          Set[BooleanFormula] = {
-        val nots =
-          for ( x <- baseFormulae )
-          yield Not(x):BooleanFormula
-        val ands =
-          for ( x <- baseFormulae; y <- baseFormulae)
-          yield And(x,y):BooleanFormula
-        val ors =
-          for ( x <- baseFormulae; y <- baseFormulae)
-          yield Or(x,y):BooleanFormula
-
-        nots union ands union ors
-      }
-
-      private def levelZero(variables: Set[VarType]): Set[BooleanFormula] = {
-        val vars: Set[BooleanFormula] = variables map Variable
-        val bools: Set[BooleanFormula] = Set(True,False)
-          vars union bools
-      }
-
-      def formulaeToLevel(depth: Int,
-                          variables: Set[VarType]) =
-        (1 to depth).scanLeft(levelZero(variables)) {
-          (current,_) =>
-          nextLevel(current)
-        }
-    }
-
   }
 
   sealed abstract class BooleanFormula {
