@@ -23,14 +23,14 @@
 // THE SOFTWARE.
 
 import org.scalatest.FunSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 
 import atb.tribool.KleeneTriBoolean
 
 class TestKleeneTriBoolean
     extends FunSpec
-    with ShouldMatchers
+    with Matchers
     with TableDrivenPropertyChecks
 {
 

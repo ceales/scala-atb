@@ -23,14 +23,14 @@
 // THE SOFTWARE.
 
 import org.scalatest.FunSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 
 import atb.tribool.KleeneTriBoolean
 import atb.tribool.LukasiewiczTriBoolean
 
 class TestTriBooleans
   extends FunSpec
-    with ShouldMatchers
+    with Matchers
 {
 
   describe("KleeneTriBooleans and LukasiewiczTriBooleans") {
