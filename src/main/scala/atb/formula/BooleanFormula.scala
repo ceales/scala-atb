@@ -84,6 +84,33 @@ package formula {
           case Or(l,r) => atoms(l) union atoms(r)
         }
 
+    def isTrivialConjunction(formula: BooleanFormula): Boolean =
+      (formula) match {
+        case x if isAtom(x) => true
+        case And(l,r) => isTrivialConjunction(l) && isTrivialConjunction(r)
+        case _ => false;
+      }
+
+    def isTrivialDisjunction(formula: BooleanFormula): Boolean =
+      (formula) match {
+        case x if isAtom(x) => true
+        case Or(l,r) => isTrivialDisjunction(l) && isTrivialDisjunction(r)
+        case _ => false;
+      }
+
+    def isCNF(formula: BooleanFormula): Boolean =
+      (formula) match {
+        case Or(l,r) => isCNF(l) && isCNF(r)
+        case x if isTrivialConjunction(x) => true
+        case _ => false
+      }
+
+    def isDNF(formula: BooleanFormula): Boolean =
+      (formula) match {
+        case And(l,r) => isDNF(l) && isDNF(r)
+        case x if isTrivialDisjunction(x) => true
+        case _ => false
+      }
   }
 
   sealed abstract class BooleanFormula {
