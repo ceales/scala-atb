@@ -22,101 +22,222 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+
 package atb
 package formula {
 
+  import scala.collection.SortedSet
+  import scala.collection.SortedSetLike
+  import scala.collection.immutable.TreeSet
+
+  sealed class SetBooleanFormula private(
+    val underlyingSet: TreeSet[BooleanFormula]
+  ) extends SortedSet[BooleanFormula]
+      with SortedSetLike[BooleanFormula,SetBooleanFormula]
+      with Ordered[SetBooleanFormula] {
+
+    def iterator = underlyingSet.iterator
+
+    def -(elem: BooleanFormula) = new SetBooleanFormula(underlyingSet-elem)
+    def +(elem: BooleanFormula) = new SetBooleanFormula(underlyingSet+elem)
+
+    def contains(elem: BooleanFormula) = underlyingSet contains elem
+
+    def rangeImpl(
+      from: Option[BooleanFormula],
+      until: Option[BooleanFormula]): SetBooleanFormula =
+      new SetBooleanFormula(underlyingSet.rangeImpl(from,until))
+
+    val ordering = BooleanFormula.ordering
+
+    override val empty = SetBooleanFormula.empty
+
+    import Ordering.Implicits.seqDerivedOrdering;
+
+    def compare(that: SetBooleanFormula) = {
+      import Ordering.Implicits.seqDerivedOrdering;
+      val thisAsSeq = this.underlyingSet.toSeq
+      val thatAsSeq = that.underlyingSet.toSeq
+      seqDerivedOrdering(ordering).compare(thisAsSeq,thatAsSeq)
+    }
+
+    def map(f: BooleanFormula=>BooleanFormula) =
+      new SetBooleanFormula(underlyingSet map f)
+
+    override def toString() = {
+      this.mkString(
+        "SetBooleanFormula(",
+        ",",
+        ")"
+      );
+    }
+
+  }
+
+  object SetBooleanFormula {
+    val empty = new SetBooleanFormula(new TreeSet[BooleanFormula]())
+    def apply(elems: BooleanFormula*) : SetBooleanFormula =
+      empty ++ elems
+  }
+
   object BooleanFormula {
 
-    type VarType = String
+    object ordering extends Ordering[BooleanFormula] {
+      def compare(o1: BooleanFormula, o2: BooleanFormula) =
+        (o1,o2) match {
+          case (Value(x),Value(y)) => x compare y
+          case (Value(_),_) => -1
+          case (_,Value(_)) => 1
+          case (Variable(x),Variable(y)) => x compare y
+          case (Variable(_),_) => -1
+          case (_,Variable(_)) => 1
+          case (Not(x),Not(y)) => x compare y
+          case (Not(_),_) => -1
+          case (_,Not(_)) => 1
+          case (And(x),And(y)) => x compare y
+          case (And(_),_) => -1
+          case (_,And(_)) => 1
+          case (Or(x),Or(y)) => x compare y
+        }
+    }
+
+    type VariableType = String
 
     case class Value(val v: Boolean) extends BooleanFormula
-    case class Variable(val v: VarType) extends BooleanFormula
-    case class Not(val v: BooleanFormula) extends BooleanFormula
-    case class And(val left: BooleanFormula, val right: BooleanFormula)
-        extends BooleanFormula
-    case class Or(val left: BooleanFormula, val right: BooleanFormula)
-        extends BooleanFormula
+    case class Variable(val v: VariableType) extends BooleanFormula
+    case class Not(val b: BooleanFormula) extends BooleanFormula
+    case class And(val s: SetBooleanFormula) extends BooleanFormula
+    case class Or(val s: SetBooleanFormula) extends BooleanFormula
 
     val True = Value(true)
     val False = Value(false)
 
-    def isAtom(formula: BooleanFormula): Boolean =
-      (formula) match {
+    def isNegative(f: BooleanFormula) =
+      (f) match {
+        case Not(x) => true
+        case Value(false) => true
+        case _ => false
+      }
+
+    def isPositive(f: BooleanFormula) = !isNegative(f)
+
+    def isConjunction(f: BooleanFormula) =
+      (f) match {
+        case And(_) => true
+        case _ => false
+      }
+
+    def isDisjunction(f: BooleanFormula) =
+      (f) match {
+        case Or(_) => true
+        case _ => false
+      }
+
+    def isNegation(f: BooleanFormula) =
+      (f) match {
+        case Not(_) => true
+        case _ => false
+      }
+
+    def isValue(f: BooleanFormula) =
+      (f) match {
         case Value(_) => true
+        case _ => false
+      }
+
+    def isVariable(f: BooleanFormula) =
+      (f) match {
         case Variable(_) => true
-        case Not(Value(_)) => true
-        case Not(Variable(_)) => true
         case _ => false
       }
 
-    def variables(formula: BooleanFormula): Set[VarType] =
-      (formula) match {
-        case Value(_) => Set.empty
-        case Variable(v) => Set(v)
-        case Not(f) => variables(f)
-        case And(l,r) => variables(l) union variables(r)
-        case Or(l,r) => variables(l) union variables(r)
+    def negate(f: BooleanFormula) =
+      (f) match {
+        case Value(x) => Value(!x)
+        case Not(x) => x
+        case x => Not(x)
       }
 
-    def depth(formula: BooleanFormula): Int =
-        (formula) match {
-          case Value(_) => 0
-          case Variable(_) => 0
-          case Not(f) => 1+depth(f)
-          case And(l,r) => 1+Math.max(depth(l),depth(r))
-          case Or(l,r) => 1+Math.max(depth(l),depth(r))
+    def contradictions(fs: SetBooleanFormula) = {
+      val (negative,positive) = fs partition isNegative
+      val contra = positive intersect (negative map negate _)
+      contra map ((x: BooleanFormula) => (x, negate(x)))
+    }
+
+    def conjoin(fs :SetBooleanFormula): BooleanFormula = {
+      if ( fs.isEmpty ) {
+        True
+      } else if (fs.size == 1) {
+        fs.head
+      } else {
+        if (fs.exists(isConjunction)) {
+          val conjunctions = fs.filter(isConjunction) map {
+            (x: BooleanFormula) => {
+              x match {
+                case And(y) => y
+              }
+            }
+          }
+          conjoin(
+            conjunctions.fold(SetBooleanFormula.empty)( _.union(_) )
+              union
+              fs.filter((x : BooleanFormula) => !isConjunction(x))
+          )
         }
-
-    def size(formula: BooleanFormula): Int =
-        (formula) match {
-          case Value(_) => 1
-          case Variable(_) => 1
-          case Not(f) => 1+size(f)
-          case And(l,r) => 1+size(l)+size(r)
-          case Or(l,r) => 1+size(l)+size(r)
+        else if ( !contradictions(fs).isEmpty ) {
+          False
+        } else {
+          And(fs)
         }
+      }
+    }
 
-    def atoms(formula: BooleanFormula): Set[BooleanFormula] =
-        (formula) match {
-          case x if isAtom(x) => Set(x)
-          case Not(f) => atoms(f)
-          case And(l,r) => atoms(l) union atoms(r)
-          case Or(l,r) => atoms(l) union atoms(r)
+    def disjoin(fs :SetBooleanFormula): BooleanFormula = {
+      if ( fs.isEmpty ) {
+        False
+      } else if (fs.size == 1) {
+        fs.head
+      } else {
+        if ( !contradictions(fs).isEmpty ) {
+          True
+        } else {
+          Or(fs)
         }
-
-    def isTrivialConjunction(formula: BooleanFormula): Boolean =
-      (formula) match {
-        case x if isAtom(x) => true
-        case And(l,r) => isTrivialConjunction(l) && isTrivialConjunction(r)
-        case _ => false;
       }
+    }
 
-    def isTrivialDisjunction(formula: BooleanFormula): Boolean =
-      (formula) match {
-        case x if isAtom(x) => true
-        case Or(l,r) => isTrivialDisjunction(l) && isTrivialDisjunction(r)
-        case _ => false;
-      }
-
-    def isCNF(formula: BooleanFormula): Boolean =
-      (formula) match {
-        case Or(l,r) => isCNF(l) && isCNF(r)
-        case x if isTrivialConjunction(x) => true
-        case _ => false
-      }
-
-    def isDNF(formula: BooleanFormula): Boolean =
-      (formula) match {
-        case And(l,r) => isDNF(l) && isDNF(r)
-        case x if isTrivialDisjunction(x) => true
-        case _ => false
+    def simplify(f: BooleanFormula): BooleanFormula =
+      (f) match {
+        case x@Value(_) => x
+        case x@Variable(_) => x
+        case Not(x) => negate(simplify(x))
+        case And(x) => conjoin(x map (simplify _ ))
+        case Or(x) => disjoin(x map (simplify _))
       }
   }
 
-  sealed abstract class BooleanFormula {
-    def and(right: BooleanFormula) = BooleanFormula.And(this,right)
-    def or(right: BooleanFormula) = BooleanFormula.Or(this,right)
-    def unary_! = BooleanFormula.Not(this)
+  sealed abstract class BooleanFormula extends Ordered[BooleanFormula] {
+
+    def compare(that: BooleanFormula): Int =
+      BooleanFormula.ordering.compare(this,that)
+
+    def and(other: BooleanFormula) =
+      BooleanFormula.conjoin(SetBooleanFormula(this,other))
+
+    def or(other: BooleanFormula) =
+      BooleanFormula.disjoin(SetBooleanFormula(this,other))
+
+    def not() = BooleanFormula.negate(this)
+
+    def implies(other: BooleanFormula) =
+      this.not() or other
+
+    def xor(other: BooleanFormula) =
+      (this or other) and (this and other).not()
+
+    def iff(other: BooleanFormula) =
+      (this xor other).not()
+
   }
 
 }

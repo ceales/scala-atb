@@ -27,50 +27,50 @@ package formula {
 
   object Hierarchy {
 
-    import BooleanFormula._
+    // import BooleanFormula._
 
-    def increment(baseFormulae: Set[BooleanFormula]):
-        Set[BooleanFormula] = {
+    // def increment(baseFormulae: Set[BooleanFormula]):
+    //     Set[BooleanFormula] = {
 
-      val nots =
-        for {
-          x <- baseFormulae
-        } yield Not(x): BooleanFormula
+    //   val nots =
+    //     for {
+    //       x <- baseFormulae
+    //     } yield Not(x): BooleanFormula
 
-      val ands =
-        for {
-          x <- baseFormulae
-          y <- baseFormulae
-        } yield And(x,y): BooleanFormula
+    //   val ands =
+    //     for {
+    //       x <- baseFormulae
+    //       y <- baseFormulae
+    //     } yield And(x,y): BooleanFormula
 
-      val ors =
-        for {
-          x <- baseFormulae
-          y <- baseFormulae
-        } yield Or(x,y): BooleanFormula
+    //   val ors =
+    //     for {
+    //       x <- baseFormulae
+    //       y <- baseFormulae
+    //     } yield Or(x,y): BooleanFormula
 
-      nots `union` ands `union` ors
-    }
+    //   nots `union` ands `union` ors
+    // }
 
-    def levelOne(variables: Set[VarType]): Set[BooleanFormula] = {
-      val vars: Set[BooleanFormula] = variables map Variable
-      val bools: Set[BooleanFormula] = Set(True,False)
-        vars union bools
-    }
+    // def levelOne(variables: Set[VarType]): Set[BooleanFormula] = {
+    //   val vars: Set[BooleanFormula] = variables map Variable
+    //   val bools: Set[BooleanFormula] = Set(True,False)
+    //     vars union bools
+    // }
 
-    def nextLevel(baseFormulae: Set[BooleanFormula]) =
-        baseFormulae union increment(baseFormulae)
+    // def nextLevel(baseFormulae: Set[BooleanFormula]) =
+    //     baseFormulae union increment(baseFormulae)
 
-    def formulaeOfLevelN(variables: Set[VarType],level: Int):
-        Set[BooleanFormula] = {
+    // def formulaeOfLevelN(variables: Set[VarType],level: Int):
+    //     Set[BooleanFormula] = {
 
-      require(level > 0)
+    //   require(level > 0)
 
-      if ( level == 1 )
-        levelOne(variables)
-      else
-        nextLevel(formulaeOfLevelN(variables,level-1))
-    }
+    //   if ( level == 1 )
+    //     levelOne(variables)
+    //   else
+    //     nextLevel(formulaeOfLevelN(variables,level-1))
+    // }
 
   }
 
