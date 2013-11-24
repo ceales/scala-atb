@@ -75,7 +75,7 @@ package formula {
     def intersect(other: SetBooleanFormula) =
       new SetBooleanFormula(underlyingSet intersect other.underlyingSet)
 
-    // I need this as the default implementation returns 
+    // I need this as the default implementation returns
     // SortedSet[BooleanFormula]
     def map(f: BooleanFormula=>BooleanFormula) =
       new SetBooleanFormula(underlyingSet map f)
@@ -112,9 +112,18 @@ package formula {
     }
 
     type VariableType = String
+    private def variableToRepr(x: VariableType) = x.mkString("\"","","\"")
 
     case class Value(val v: Boolean) extends BooleanFormula
-    case class Variable(val v: VariableType) extends BooleanFormula
+    case class Variable(val v: VariableType) extends BooleanFormula {
+      private lazy val name = {
+        val sb = new StringBuilder("Variable(")
+        sb.append(variableToRepr(v))
+        sb.append(")")
+        sb.result
+      }
+      override def toString = name
+    }
     case class Not(val b: BooleanFormula) extends BooleanFormula
     case class And(val s: SetBooleanFormula) extends BooleanFormula
     case class Or(val s: SetBooleanFormula) extends BooleanFormula
