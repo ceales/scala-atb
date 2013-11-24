@@ -71,6 +71,12 @@ package formula {
       seqDerivedOrdering(ordering).compare(thisAsSeq,thatAsSeq)
     }
 
+    // I have to put this in otherwise (SetBooleanFormula() intersect _) == null
+    def intersect(other: SetBooleanFormula) =
+      new SetBooleanFormula(underlyingSet intersect other.underlyingSet)
+
+    // I need this as the default implementation returns 
+    // SortedSet[BooleanFormula]
     def map(f: BooleanFormula=>BooleanFormula) =
       new SetBooleanFormula(underlyingSet map f)
 
