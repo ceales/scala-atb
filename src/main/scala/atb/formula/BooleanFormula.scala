@@ -44,6 +44,8 @@ package formula {
       with SortedSetLike[BooleanFormula,SetBooleanFormula]
       with Ordered[SetBooleanFormula] {
 
+    require(underlyingSet != null)
+
     def iterator = underlyingSet.iterator
 
     def -(elem: BooleanFormula) = new SetBooleanFormula(underlyingSet-elem)
