@@ -190,6 +190,8 @@ package formula {
     def conjoin(fs: SetBooleanFormula): BooleanFormula = {
       if ( fs.isEmpty ) {
         True
+      } else if (fs contains False) {
+        False
       } else if (fs.size == 1) {
         fs.head
       } else if (fs.exists(isConjunction)) {
@@ -198,12 +200,14 @@ package formula {
             (x) => x.asInstanceOf[And]
           } map conjunctants _
         conjoin(
-          conjunctions.reduce(_.union(_) )
+          conjunctions.foldLeft(SetBooleanFormula.empty)(_.union(_) )
             union
             fs.filterNot(isConjunction)
         )
       } else if ( !contradictions(fs).isEmpty ) {
         False
+      } else if ( fs contains True ) {
+        conjoin(fs filterNot(True.equals _))
       } else {
         And(fs)
       }
@@ -215,22 +219,26 @@ package formula {
     def disjoin(fs: SetBooleanFormula): BooleanFormula = {
       if ( fs.isEmpty ) {
         False
+      } else if (fs contains True) {
+        True
       } else if (fs.size == 1) {
         fs.head
-      } else if (fs.exists(isConjunction)) {
+      } else if (fs.exists(isDisjunction)) {
         val disjunctions: Seq[SetBooleanFormula] =
           fs.toSeq.filter(isDisjunction) map {
             (x) => x.asInstanceOf[Or]
           } map disjunctants _
         conjoin(
-          disjunctions.reduce(_.union(_) )
+          disjunctions.foldLeft(SetBooleanFormula.empty)(_.union(_) )
             union
             fs.filterNot(isDisjunction)
         )
       } else if ( !contradictions(fs).isEmpty ) {
           True
+      } else if ( fs contains False ) {
+          disjoin(fs.filterNot(False.equals _))
       } else {
-          Or(fs)
+        Or(fs)
       }
     }
 
