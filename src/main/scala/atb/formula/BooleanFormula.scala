@@ -241,14 +241,16 @@ package formula {
 
     def not() = BooleanFormula.negate(this)
 
+    def unary_! = not()
+
     def implies(other: BooleanFormula) =
-      this.not() or other
+      !this or other
 
     def xor(other: BooleanFormula) =
-      (this or other) and (this and other).not()
+      (this or other) and !(this and other)
 
     def iff(other: BooleanFormula) =
-      (this xor other).not()
+      !(this xor other)
 
   }
 
