@@ -121,6 +121,16 @@ package formula {
 
     def isPositive(f: BooleanFormula) = !isNegative(f)
 
+    def conjunctants(f: And) =
+      (f) match {
+        case And(c) => c
+      }
+
+    def disjunctants(f: Or) =
+      (f) match {
+        case Or(c) => c
+      }
+
     def isConjunction(f: BooleanFormula) =
       (f) match {
         case And(_) => true
@@ -169,26 +179,20 @@ package formula {
         True
       } else if (fs.size == 1) {
         fs.head
+      } else if (fs.exists(isConjunction)) {
+        val conjunctions :Seq[SetBooleanFormula] =
+          fs.toSeq.filter(isConjunction) map {
+            (x) => x.asInstanceOf[And]
+          } map conjunctants _
+        conjoin(
+          conjunctions.reduce(_.union(_) )
+            union
+            fs.filterNot(isConjunction)
+        )
+      } else if ( !contradictions(fs).isEmpty ) {
+        False
       } else {
-        if (fs.exists(isConjunction)) {
-          val conjunctions = fs.filter(isConjunction) map {
-            (x: BooleanFormula) => {
-              x match {
-                case And(y) => y
-              }
-            }
-          }
-          conjoin(
-            conjunctions.fold(SetBooleanFormula.empty)( _.union(_) )
-              union
-              fs.filter((x : BooleanFormula) => !isConjunction(x))
-          )
-        }
-        else if ( !contradictions(fs).isEmpty ) {
-          False
-        } else {
-          And(fs)
-        }
+        And(fs)
       }
     }
 
@@ -197,12 +201,20 @@ package formula {
         False
       } else if (fs.size == 1) {
         fs.head
-      } else {
-        if ( !contradictions(fs).isEmpty ) {
+      } else if (fs.exists(isConjunction)) {
+        val disjunctions :Seq[SetBooleanFormula] =
+          fs.toSeq.filter(isDisjunction) map {
+            (x) => x.asInstanceOf[Or]
+          } map disjunctants _
+        conjoin(
+          disjunctions.reduce(_.union(_) )
+            union
+            fs.filterNot(isDisjunction)
+        )
+      } else if ( !contradictions(fs).isEmpty ) {
           True
-        } else {
+      } else {
           Or(fs)
-        }
       }
     }
 
