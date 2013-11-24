@@ -76,7 +76,9 @@ package formula {
 
   object SetBooleanFormula {
     val empty = new SetBooleanFormula(new TreeSet[BooleanFormula]())
-    def apply(elems: BooleanFormula*) : SetBooleanFormula =
+    def apply(elems: BooleanFormula*) =
+      fromSeq(elems)
+    def fromSeq(elems: Seq[BooleanFormula]) =
       empty ++ elems
   }
 
@@ -174,13 +176,16 @@ package formula {
       contra map ((x: BooleanFormula) => (x, negate(x)))
     }
 
-    def conjoin(fs :SetBooleanFormula): BooleanFormula = {
+    def conjoin(fs: BooleanFormula*): BooleanFormula =
+      conjoin(SetBooleanFormula fromSeq fs)
+
+    def conjoin(fs: SetBooleanFormula): BooleanFormula = {
       if ( fs.isEmpty ) {
         True
       } else if (fs.size == 1) {
         fs.head
       } else if (fs.exists(isConjunction)) {
-        val conjunctions :Seq[SetBooleanFormula] =
+        val conjunctions: Seq[SetBooleanFormula] =
           fs.toSeq.filter(isConjunction) map {
             (x) => x.asInstanceOf[And]
           } map conjunctants _
@@ -196,13 +201,16 @@ package formula {
       }
     }
 
-    def disjoin(fs :SetBooleanFormula): BooleanFormula = {
+    def disjoin(fs: BooleanFormula*): BooleanFormula =
+      disjoin(SetBooleanFormula fromSeq fs)
+
+    def disjoin(fs: SetBooleanFormula): BooleanFormula = {
       if ( fs.isEmpty ) {
         False
       } else if (fs.size == 1) {
         fs.head
       } else if (fs.exists(isConjunction)) {
-        val disjunctions :Seq[SetBooleanFormula] =
+        val disjunctions: Seq[SetBooleanFormula] =
           fs.toSeq.filter(isDisjunction) map {
             (x) => x.asInstanceOf[Or]
           } map disjunctants _
@@ -234,10 +242,10 @@ package formula {
       BooleanFormula.ordering.compare(this,that)
 
     def and(other: BooleanFormula) =
-      BooleanFormula.conjoin(SetBooleanFormula(this,other))
+      BooleanFormula.conjoin(this,other)
 
     def or(other: BooleanFormula) =
-      BooleanFormula.disjoin(SetBooleanFormula(this,other))
+      BooleanFormula.disjoin(this,other)
 
     def not() = BooleanFormula.negate(this)
 
