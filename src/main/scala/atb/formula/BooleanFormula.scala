@@ -30,6 +30,14 @@ package formula {
   import scala.collection.SortedSetLike
   import scala.collection.immutable.TreeSet
 
+  object SetBooleanFormula {
+    val empty = new SetBooleanFormula(new TreeSet[BooleanFormula]())
+    def apply(elems: BooleanFormula*) =
+      fromSeq(elems)
+    def fromSeq(elems: Seq[BooleanFormula]) =
+      empty ++ elems
+  }
+
   sealed class SetBooleanFormula private(
     val underlyingSet: TreeSet[BooleanFormula]
   ) extends SortedSet[BooleanFormula]
@@ -72,14 +80,6 @@ package formula {
       );
     }
 
-  }
-
-  object SetBooleanFormula {
-    val empty = new SetBooleanFormula(new TreeSet[BooleanFormula]())
-    def apply(elems: BooleanFormula*) =
-      fromSeq(elems)
-    def fromSeq(elems: Seq[BooleanFormula]) =
-      empty ++ elems
   }
 
   object BooleanFormula {
