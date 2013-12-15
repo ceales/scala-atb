@@ -29,6 +29,9 @@ package formula {
   import scala.collection.SortedSet
   import scala.collection.SortedSetLike
   import scala.collection.immutable.TreeSet
+  import scala.collection.mutable.Builder
+  import scala.collection.mutable.ArrayBuffer
+  import scala.collection.generic.CanBuildFrom
 
   object SetBooleanFormula {
     val empty = new SetBooleanFormula(new TreeSet[BooleanFormula]())
@@ -36,6 +39,17 @@ package formula {
       fromSeq(elems)
     def fromSeq(elems: Seq[BooleanFormula]) =
       empty ++ elems
+
+    def newBuilder: Builder[BooleanFormula,SetBooleanFormula] =
+      new ArrayBuffer[BooleanFormula] mapResult fromSeq
+
+    implicit def canBuildFrom:
+        CanBuildFrom[SetBooleanFormula,BooleanFormula,SetBooleanFormula] =
+      new CanBuildFrom[SetBooleanFormula,BooleanFormula,SetBooleanFormula] {
+        def apply() : Builder[BooleanFormula,SetBooleanFormula] = newBuilder
+        def apply(from: SetBooleanFormula):
+            Builder[BooleanFormula,SetBooleanFormula] = newBuilder
+      }
   }
 
   sealed class SetBooleanFormula private(
@@ -45,6 +59,9 @@ package formula {
       with Ordered[SetBooleanFormula] {
 
     require(underlyingSet != null)
+
+    override def newBuilder: Builder[BooleanFormula,SetBooleanFormula] =
+      SetBooleanFormula.newBuilder;
 
     def iterator = underlyingSet.iterator
 
@@ -62,23 +79,12 @@ package formula {
 
     override val empty = SetBooleanFormula.empty
 
-    import Ordering.Implicits.seqDerivedOrdering;
-
     def compare(that: SetBooleanFormula) = {
       import Ordering.Implicits.seqDerivedOrdering;
       val thisAsSeq = this.underlyingSet.toSeq
       val thatAsSeq = that.underlyingSet.toSeq
       seqDerivedOrdering(ordering).compare(thisAsSeq,thatAsSeq)
     }
-
-    // I have to put this in otherwise (SetBooleanFormula() intersect _) == null
-    def intersect(other: SetBooleanFormula) =
-      new SetBooleanFormula(underlyingSet intersect other.underlyingSet)
-
-    // I need this as the default implementation returns
-    // SortedSet[BooleanFormula]
-    def map(f: BooleanFormula=>BooleanFormula) =
-      new SetBooleanFormula(underlyingSet map f)
 
     override def toString() = {
       this.mkString(
